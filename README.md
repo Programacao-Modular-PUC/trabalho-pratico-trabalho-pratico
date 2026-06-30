@@ -6,6 +6,36 @@ Sistema de Informação modular com **API REST** para gerenciamento de hospedage
 
 ---
 
+## ✅ Pré-requisitos
+
+Para rodar o projeto você precisa apenas de:
+
+- **Java JDK 17 ou superior** instalado (confira com `java -version`). Download: [Adoptium / Temurin](https://adoptium.net/).
+- **Conexão com a internet** na primeira execução (para baixar o Maven e as dependências do Spring).
+
+> O **Maven NÃO precisa ser instalado** — o projeto já inclui o Maven Wrapper (`mvnw`).
+> O **MySQL NÃO é necessário** para avaliar — use o perfil `dev` (banco H2 em memória) descrito abaixo.
+
+## 🚀 Avaliação rápida (2 comandos, sem instalar banco de dados)
+
+Clone o repositório (ou baixe o ZIP em **Code → Download ZIP** no GitHub), entre na pasta do projeto e:
+
+```bash
+# 1) Rodar os 41 testes automatizados (usam H2 em memória; não exigem MySQL)
+mvnw.cmd test          # Windows
+./mvnw test            # Linux / Mac
+
+# 2) Subir a aplicação com dados de exemplo (também sem MySQL)
+mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=dev"     # Windows
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev         # Linux / Mac
+```
+
+Depois, abra a documentação interativa e teste os endpoints: **http://localhost:8080/swagger-ui.html**
+
+> Para rodar com **MySQL** (persistência real, como descrito no enunciado), veja a seção [Como executar](#️-como-executar).
+
+---
+
 ## 🧱 Tecnologias
 
 | Camada | Tecnologia |
