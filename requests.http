@@ -1,0 +1,128 @@
+### ==========================================================================
+###  Sistema de Hospedagem - Exemplos de requisicoes da API REST
+###
+###  Como usar:
+###   - VS Code: instale a extensao "REST Client" e clique em "Send Request"
+###     acima de cada bloco.
+###   - IntelliJ IDEA: abra este arquivo e clique no botao "Run" (triangulo).
+###
+###  Suba a aplicacao no perfil dev (H2, sem MySQL):
+###     mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=dev"
+###
+###  No perfil dev o seed ja cria: residencia id=1, quartos id=1 e id=2,
+###  cliente id=1 (email joao.silva@example.com / senha "senha123").
+###  Ajuste as datas abaixo para o futuro, se necessario.
+### ==========================================================================
+
+@baseUrl = http://localhost:8080
+
+### 1) Cadastrar um novo cliente
+POST {{baseUrl}}/api/clientes
+Content-Type: application/json
+
+{
+  "nome": "Maria Souza",
+  "cpf": "529.982.247-25",
+  "endereco": "Rua das Conchas, 45 - Barra Grande",
+  "telefone": "(73) 98888-2222",
+  "email": "maria.souza@example.com",
+  "senha": "segredo123"
+}
+
+### 2) Autenticar (login)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "maria.souza@example.com",
+  "senha": "segredo123"
+}
+
+### 3) Cadastrar uma residencia
+POST {{baseUrl}}/api/residencias
+Content-Type: application/json
+
+{
+  "endereco": "Avenida Beira-Mar",
+  "numero": "500",
+  "bairro": "Taipu de Fora",
+  "cep": "45520-000",
+  "telefone": "(73) 99999-1234",
+  "email": "pousada.taipu@example.com"
+}
+
+### 4) Cadastrar um quarto na residencia (ajuste residenciaId conforme a resposta do passo 3)
+POST {{baseUrl}}/api/quartos
+Content-Type: application/json
+
+{
+  "residenciaId": 1,
+  "numero": "301",
+  "tipo": "CASAL",
+  "valorBase": 250.00,
+  "temArCondicionado": true,
+  "temHidromassagem": true,
+  "descricao": "Suite casal com vista para o mar"
+}
+
+### 5) Consultar disponibilidade do quarto em um periodo
+GET {{baseUrl}}/api/quartos/1/disponibilidade?dataEntrada=2026-08-01T14:00:00&dataSaida=2026-08-03T11:00:00
+
+### 6) Criar uma reserva futura
+POST {{baseUrl}}/api/reservas
+Content-Type: application/json
+
+{
+  "quartoId": 1,
+  "clienteId": 1,
+  "dataEntrada": "2026-09-10T14:00:00",
+  "dataSaida": "2026-09-12T11:00:00"
+}
+
+### 7) Confirmar a reserva (ajuste o id conforme a resposta do passo 6)
+PATCH {{baseUrl}}/api/reservas/1/confirmar
+
+### 8) Realizar um aluguel (calcula diarias, valor final e gera o pagamento)
+POST {{baseUrl}}/api/alugueis
+Content-Type: application/json
+
+{
+  "quartoId": 1,
+  "clienteId": 1,
+  "dataEntrada": "2026-08-01T14:00:00",
+  "dataSaida": "2026-08-03T11:00:00"
+}
+
+### 9) Emitir o recibo/formulario do aluguel (ajuste o id conforme a resposta do passo 8)
+GET {{baseUrl}}/api/alugueis/1/recibo
+
+### 10) Tentar alugar o MESMO quarto em periodo sobreposto -> deve retornar 409 (Conflito)
+POST {{baseUrl}}/api/alugueis
+Content-Type: application/json
+
+{
+  "quartoId": 1,
+  "clienteId": 1,
+  "dataEntrada": "2026-08-02T14:00:00",
+  "dataSaida": "2026-08-04T11:00:00"
+}
+
+### 11) Historico de alugueis da residencia
+GET {{baseUrl}}/api/alugueis/residencia/1
+
+### 12) Consultar o pagamento gerado para o aluguel
+GET {{baseUrl}}/api/pagamentos/aluguel/1
+
+### 13) Quitar o pagamento (ajuste o id do pagamento conforme a resposta do passo 12)
+PATCH {{baseUrl}}/api/pagamentos/1/pagar
+Content-Type: application/json
+
+{
+  "formaPagamento": "PIX"
+}
+
+### 14) Listar todos os clientes
+GET {{baseUrl}}/api/clientes
+
+### 15) Listar todas as residencias (com seus quartos)
+GET {{baseUrl}}/api/residencias

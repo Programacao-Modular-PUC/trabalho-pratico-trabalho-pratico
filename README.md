@@ -51,6 +51,103 @@ controller  ->  service  ->  repository  ->  model (entidades JPA)
 
 ---
 
+## 📊 Diagrama de classes (modelagem orientada a objetos)
+
+```mermaid
+classDiagram
+    class Residencia {
+        +Long id
+        +String endereco
+        +String numero
+        +String bairro
+        +String cep
+        +String telefone
+        +String email
+    }
+    class Quarto {
+        +Long id
+        +String numero
+        +TipoQuarto tipo
+        +BigDecimal valorBase
+        +boolean temArCondicionado
+        +boolean temHidromassagem
+        +String descricao
+    }
+    class Cliente {
+        +Long id
+        +String nome
+        +String cpf
+        +String endereco
+        +String telefone
+        +String email
+        -String senha
+    }
+    class Aluguel {
+        +Long id
+        +LocalDateTime dataEntrada
+        +LocalDateTime dataSaida
+        +long numeroDiarias
+        +BigDecimal valorDiaria
+        +BigDecimal valorFinal
+        +LocalDateTime dataCriacao
+    }
+    class Pagamento {
+        +Long id
+        +BigDecimal valor
+        +StatusPagamento status
+        +FormaPagamento formaPagamento
+        +LocalDateTime dataPagamento
+    }
+    class Reserva {
+        +Long id
+        +LocalDateTime dataEntrada
+        +LocalDateTime dataSaida
+        +StatusReserva status
+        +LocalDateTime dataCriacao
+    }
+    class TipoQuarto {
+        <<enumeration>>
+        INDIVIDUAL
+        CASAL
+    }
+    class StatusReserva {
+        <<enumeration>>
+        PENDENTE
+        CONFIRMADA
+        CANCELADA
+        CONCLUIDA
+    }
+    class StatusPagamento {
+        <<enumeration>>
+        PENDENTE
+        PAGO
+        CANCELADO
+    }
+    class FormaPagamento {
+        <<enumeration>>
+        DINHEIRO
+        CARTAO_CREDITO
+        CARTAO_DEBITO
+        PIX
+    }
+
+    Residencia "1" *-- "0..*" Quarto : possui
+    Aluguel "*" --> "1" Residencia
+    Aluguel "*" --> "1" Quarto
+    Aluguel "*" --> "1" Cliente
+    Aluguel "1" *-- "1" Pagamento : gera
+    Reserva "*" --> "1" Quarto
+    Reserva "*" --> "1" Cliente
+    Quarto ..> TipoQuarto
+    Reserva ..> StatusReserva
+    Pagamento ..> StatusPagamento
+    Pagamento ..> FormaPagamento
+```
+
+> O GitHub renderiza este diagrama automaticamente. Os relacionamentos `*--` indicam composição (o todo controla o ciclo de vida da parte): a residência gerencia seus quartos e o aluguel gera/controla seu pagamento.
+
+---
+
 ## 📐 Regras de negócio implementadas
 
 1. **Cálculo de diárias (início às 12h)** — `CalculadoraDiaria.calcularNumeroDiarias`:
@@ -63,12 +160,31 @@ controller  ->  service  ->  repository  ->  model (entidades JPA)
 5. **Todo aluguel gera um pagamento associado** — criado junto com o aluguel (status PENDENTE).
 6. **Histórico de aluguéis por residência** — `GET /api/alugueis/residencia/{id}`.
 7. **Formulário/recibo de aluguel** — `GET /api/alugueis/{id}/recibo`.
+8. **Validações adicionais** — não é permitido aluguel ou reserva com data de entrada no passado; reservas já concluídas não podem ser confirmadas nem canceladas; pagamentos só podem ser quitados quando estão pendentes.
 
 ---
 
 ## ▶️ Como executar
 
 > Não é necessário instalar o Maven — use o wrapper `./mvnw` (Linux/Mac) ou `mvnw.cmd` (Windows).
+
+### ⚡ Opção rápida — rodar SEM instalar o MySQL (perfil `dev`)
+
+Sobe a aplicação inteira usando **H2 em memória**, já com dados de exemplo (1 residência, 2 quartos, 1 cliente):
+
+```bash
+# Windows
+mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=dev"
+
+# Linux / Mac
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+- API: `http://localhost:8080` · Swagger: `http://localhost:8080/swagger-ui.html`
+- Console do banco: `http://localhost:8080/h2-console` (JDBC URL `jdbc:h2:mem:hospedagem`, usuário `sa`, sem senha)
+- Use o arquivo [`requests.http`](requests.http) para disparar requisições de exemplo (VS Code REST Client ou IntelliJ HTTP Client).
+
+> Em H2 os dados são recriados a cada inicialização. Para persistência real (exigida na entrega), use o **MySQL** abaixo.
 
 ### 1. Banco de dados (MySQL)
 
@@ -101,7 +217,7 @@ mvnw.cmd test      # Windows
 ./mvnw test        # Linux / Mac
 ```
 
-Os testes usam **H2 em memória** — não exigem o MySQL.
+Os testes usam **H2 em memória** — não exigem o MySQL. São **38 testes**: unitários dos serviços (com Mockito) e de integração ponta a ponta dos endpoints REST (com MockMvc).
 
 ---
 

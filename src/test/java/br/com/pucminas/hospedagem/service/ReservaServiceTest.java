@@ -2,6 +2,7 @@ package br.com.pucminas.hospedagem.service;
 
 import br.com.pucminas.hospedagem.dto.reserva.ReservaRequest;
 import br.com.pucminas.hospedagem.dto.reserva.ReservaResponse;
+import br.com.pucminas.hospedagem.exception.BusinessException;
 import br.com.pucminas.hospedagem.exception.QuartoIndisponivelException;
 import br.com.pucminas.hospedagem.exception.ResourceNotFoundException;
 import br.com.pucminas.hospedagem.model.Cliente;
@@ -22,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -70,8 +72,8 @@ class ReservaServiceTest {
                 "31999990000", "maria@example.com", "hash");
         cliente.setId(2L);
 
-        entrada = LocalDateTime.of(2026, 7, 10, 14, 0);
-        saida = LocalDateTime.of(2026, 7, 12, 12, 0);
+        entrada = LocalDate.now().plusDays(10).atTime(14, 0);
+        saida = LocalDate.now().plusDays(12).atTime(12, 0);
     }
 
     @Test
@@ -139,6 +141,39 @@ class ReservaServiceTest {
 
         verify(disponibilidadeService, never())
                 .validarDisponibilidade(anyLong(), any(), any());
+        verify(reservaRepository, never()).save(any(Reserva.class));
+    }
+
+    @Test
+    @DisplayName("criar deve falhar quando a data de entrada esta no passado")
+    void criarComDataNoPassado() {
+        LocalDateTime entradaPassada = LocalDate.now().minusDays(1).atTime(14, 0);
+        LocalDateTime saidaFutura = LocalDate.now().plusDays(1).atTime(11, 0);
+        ReservaRequest request = new ReservaRequest(1L, 2L, entradaPassada, saidaFutura);
+
+        when(quartoRepository.findById(1L)).thenReturn(Optional.of(quarto));
+        when(clienteRepository.findById(2L)).thenReturn(Optional.of(cliente));
+
+        assertThatThrownBy(() -> reservaService.criar(request))
+                .isInstanceOf(BusinessException.class);
+
+        verify(disponibilidadeService, never())
+                .validarDisponibilidade(anyLong(), any(), any());
+        verify(reservaRepository, never()).save(any(Reserva.class));
+    }
+
+    @Test
+    @DisplayName("confirmar deve falhar quando a reserva ja esta concluida")
+    void confirmarReservaConcluida() {
+        Reserva reserva = new Reserva(quarto, cliente, entrada, saida);
+        reserva.setId(8L);
+        reserva.setStatus(StatusReserva.CONCLUIDA);
+
+        when(reservaRepository.findById(8L)).thenReturn(Optional.of(reserva));
+
+        assertThatThrownBy(() -> reservaService.confirmar(8L))
+                .isInstanceOf(BusinessException.class);
+
         verify(reservaRepository, never()).save(any(Reserva.class));
     }
 

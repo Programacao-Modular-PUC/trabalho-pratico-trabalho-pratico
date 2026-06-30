@@ -61,11 +61,12 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Banco em memoria para os testes automatizados -->
+        <!-- Banco em memoria: usado nos testes automatizados e no perfil "dev"
+             (permite rodar a aplicacao sem instalar o MySQL). -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- Testes (JUnit 5, Mockito, Spring Test) -->

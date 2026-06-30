@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -72,6 +73,10 @@ public class AluguelService {
         if (residencia == null) {
             throw new BusinessException(
                     "O quarto " + req.quartoId() + " nao esta vinculado a uma residencia.");
+        }
+
+        if (req.dataEntrada() != null && req.dataEntrada().isBefore(LocalDateTime.now())) {
+            throw new BusinessException("A data de entrada nao pode estar no passado.");
         }
 
         disponibilidadeService.validarDisponibilidade(

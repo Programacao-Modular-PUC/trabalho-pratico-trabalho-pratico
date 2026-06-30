@@ -3,6 +3,7 @@ package br.com.pucminas.hospedagem.service;
 import br.com.pucminas.hospedagem.dto.aluguel.AluguelRequest;
 import br.com.pucminas.hospedagem.dto.aluguel.AluguelResponse;
 import br.com.pucminas.hospedagem.dto.aluguel.ReciboResponse;
+import br.com.pucminas.hospedagem.exception.BusinessException;
 import br.com.pucminas.hospedagem.exception.QuartoIndisponivelException;
 import br.com.pucminas.hospedagem.model.Aluguel;
 import br.com.pucminas.hospedagem.model.Cliente;
@@ -24,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -59,8 +61,10 @@ class AluguelServiceTest {
     private CalculadoraDiaria calculadoraDiaria;
     private AluguelService aluguelService;
 
-    private static final LocalDateTime ENTRADA = LocalDateTime.of(2026, 7, 1, 14, 0);
-    private static final LocalDateTime SAIDA = LocalDateTime.of(2026, 7, 3, 11, 0);
+    // Datas relativas (sempre no futuro) preservando 2 diarias:
+    // entrada as 14h e saida 2 dias depois as 11h (antes do meio-dia).
+    private static final LocalDateTime ENTRADA = LocalDate.now().plusDays(1).atTime(14, 0);
+    private static final LocalDateTime SAIDA = LocalDate.now().plusDays(3).atTime(11, 0);
 
     @BeforeEach
     void setUp() {
@@ -134,6 +138,24 @@ class AluguelServiceTest {
 
         assertThatThrownBy(() -> aluguelService.realizar(request))
                 .isInstanceOf(QuartoIndisponivelException.class);
+
+        verify(aluguelRepository, never()).save(any(Aluguel.class));
+    }
+
+    @Test
+    void realizar_falhaQuandoDataEntradaNoPassado() {
+        Quarto quarto = quartoComArCondicionado();
+        Cliente cliente = cliente();
+
+        when(quartoRepository.findById(1L)).thenReturn(Optional.of(quarto));
+        when(clienteRepository.findById(2L)).thenReturn(Optional.of(cliente));
+
+        LocalDateTime entradaNoPassado = LocalDate.now().minusDays(2).atTime(14, 0);
+        LocalDateTime saidaNoPassado = LocalDate.now().minusDays(1).atTime(11, 0);
+        AluguelRequest request = new AluguelRequest(1L, 2L, entradaNoPassado, saidaNoPassado, null);
+
+        assertThatThrownBy(() -> aluguelService.realizar(request))
+                .isInstanceOf(BusinessException.class);
 
         verify(aluguelRepository, never()).save(any(Aluguel.class));
     }

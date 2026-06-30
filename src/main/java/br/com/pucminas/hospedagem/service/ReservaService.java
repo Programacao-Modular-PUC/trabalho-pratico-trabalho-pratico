@@ -14,6 +14,7 @@ import br.com.pucminas.hospedagem.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -57,6 +58,10 @@ public class ReservaService {
 
         Cliente cliente = clienteRepository.findById(request.clienteId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente", request.clienteId()));
+
+        if (request.dataEntrada() != null && request.dataEntrada().isBefore(LocalDateTime.now())) {
+            throw new BusinessException("A data de entrada da reserva nao pode estar no passado.");
+        }
 
         disponibilidadeService.validarDisponibilidade(
                 quarto.getId(), request.dataEntrada(), request.dataSaida());
@@ -108,6 +113,9 @@ public class ReservaService {
         if (reserva.getStatus() == StatusReserva.CANCELADA) {
             throw new BusinessException("Nao e possivel confirmar uma reserva cancelada.");
         }
+        if (reserva.getStatus() == StatusReserva.CONCLUIDA) {
+            throw new BusinessException("Nao e possivel confirmar uma reserva ja concluida.");
+        }
         reserva.setStatus(StatusReserva.CONFIRMADA);
         return ReservaResponse.fromEntity(reservaRepository.save(reserva));
     }
@@ -116,10 +124,14 @@ public class ReservaService {
      * Cancela uma reserva, passando seu status para CANCELADA.
      *
      * @throws ResourceNotFoundException se a reserva nao existir.
+     * @throws BusinessException         se a reserva ja estiver concluida.
      */
     @Transactional
     public ReservaResponse cancelar(Long id) {
         Reserva reserva = buscarEntidade(id);
+        if (reserva.getStatus() == StatusReserva.CONCLUIDA) {
+            throw new BusinessException("Nao e possivel cancelar uma reserva ja concluida.");
+        }
         reserva.setStatus(StatusReserva.CANCELADA);
         return ReservaResponse.fromEntity(reservaRepository.save(reserva));
     }
