@@ -195,6 +195,21 @@ Tenha um MySQL rodando em `localhost:3306`. O schema `hospedagem` é criado auto
 $env:DB_USERNAME="root"; $env:DB_PASSWORD="suasenha"
 ```
 
+#### Subir o MySQL rapidamente com Docker (opcional)
+
+Se você usa Docker, pode subir um MySQL já configurado (usuário `root`, senha `root`, banco `hospedagem`) com um comando:
+
+```bash
+docker run --name hospedagem-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=hospedagem -p 3306:3306 -v hospedagem-mysql-data:/var/lib/mysql -d mysql:8
+```
+
+Para parar e retomar depois (os dados ficam salvos no volume `hospedagem-mysql-data`):
+
+```bash
+docker stop hospedagem-mysql     # pausa o banco
+docker start hospedagem-mysql    # retoma com os dados intactos
+```
+
 ### 2. Rodar a aplicação
 
 ```bash
