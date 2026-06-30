@@ -5,6 +5,8 @@ import br.com.pucminas.hospedagem.dto.aluguel.AluguelResponse;
 import br.com.pucminas.hospedagem.dto.aluguel.ReciboResponse;
 import br.com.pucminas.hospedagem.service.AluguelService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,8 +42,8 @@ public class AluguelController {
 
     /** Lista todos os alugueis. */
     @GetMapping
-    public ResponseEntity<List<AluguelResponse>> listar() {
-        return ResponseEntity.ok(aluguelService.listar());
+    public ResponseEntity<Page<AluguelResponse>> listar(Pageable pageable) {
+        return ResponseEntity.ok(aluguelService.listar(pageable));
     }
 
     /** Busca um aluguel pelo seu identificador. */

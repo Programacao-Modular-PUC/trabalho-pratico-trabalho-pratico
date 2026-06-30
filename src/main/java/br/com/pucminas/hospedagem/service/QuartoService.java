@@ -10,6 +10,8 @@ import br.com.pucminas.hospedagem.repository.QuartoRepository;
 import br.com.pucminas.hospedagem.repository.ResidenciaRepository;
 import br.com.pucminas.hospedagem.service.calculo.CalculadoraDiaria;
 import br.com.pucminas.hospedagem.service.factory.QuartoFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,10 +64,8 @@ public class QuartoService {
     }
 
     @Transactional(readOnly = true)
-    public List<QuartoResponse> listar() {
-        return quartoRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<QuartoResponse> listar(Pageable pageable) {
+        return quartoRepository.findAll(pageable).map(this::toResponse);
     }
 
     @Transactional(readOnly = true)

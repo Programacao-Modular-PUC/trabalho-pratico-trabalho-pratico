@@ -126,3 +126,12 @@ GET {{baseUrl}}/api/clientes
 
 ### 15) Listar todas as residencias (com seus quartos)
 GET {{baseUrl}}/api/residencias
+
+### 16) Relatorio: faturamento de uma residencia
+GET {{baseUrl}}/api/relatorios/faturamento/residencia/1
+
+### 17) Relatorio: quartos disponiveis em um periodo
+GET {{baseUrl}}/api/relatorios/quartos-disponiveis?dataEntrada=2026-09-01T14:00:00&dataSaida=2026-09-03T11:00:00
+
+### 18) Listagem paginada (parametros page, size e sort)
+GET {{baseUrl}}/api/clientes?page=0&size=10&sort=nome,asc

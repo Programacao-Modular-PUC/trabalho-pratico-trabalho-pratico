@@ -11,6 +11,8 @@ import br.com.pucminas.hospedagem.model.enums.StatusReserva;
 import br.com.pucminas.hospedagem.repository.ClienteRepository;
 import br.com.pucminas.hospedagem.repository.QuartoRepository;
 import br.com.pucminas.hospedagem.repository.ReservaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,10 +77,8 @@ public class ReservaService {
      * Lista todas as reservas cadastradas.
      */
     @Transactional(readOnly = true)
-    public List<ReservaResponse> listar() {
-        return reservaRepository.findAll().stream()
-                .map(ReservaResponse::fromEntity)
-                .toList();
+    public Page<ReservaResponse> listar(Pageable pageable) {
+        return reservaRepository.findAll(pageable).map(ReservaResponse::fromEntity);
     }
 
     /**

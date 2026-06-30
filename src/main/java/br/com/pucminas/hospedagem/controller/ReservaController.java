@@ -4,6 +4,8 @@ import br.com.pucminas.hospedagem.dto.reserva.ReservaRequest;
 import br.com.pucminas.hospedagem.dto.reserva.ReservaResponse;
 import br.com.pucminas.hospedagem.service.ReservaService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,8 +50,8 @@ public class ReservaController {
      * Lista todas as reservas.
      */
     @GetMapping
-    public ResponseEntity<List<ReservaResponse>> listar() {
-        return ResponseEntity.ok(reservaService.listar());
+    public ResponseEntity<Page<ReservaResponse>> listar(Pageable pageable) {
+        return ResponseEntity.ok(reservaService.listar(pageable));
     }
 
     /**

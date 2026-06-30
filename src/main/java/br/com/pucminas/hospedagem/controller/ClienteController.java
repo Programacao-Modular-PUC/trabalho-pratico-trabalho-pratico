@@ -5,6 +5,8 @@ import br.com.pucminas.hospedagem.dto.cliente.ClienteResponse;
 import br.com.pucminas.hospedagem.dto.cliente.ClienteUpdateRequest;
 import br.com.pucminas.hospedagem.service.ClienteService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,8 +46,8 @@ public class ClienteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ClienteResponse>> listar() {
-        return ResponseEntity.ok(clienteService.listar());
+    public ResponseEntity<Page<ClienteResponse>> listar(Pageable pageable) {
+        return ResponseEntity.ok(clienteService.listar(pageable));
     }
 
     @GetMapping("/{id}")

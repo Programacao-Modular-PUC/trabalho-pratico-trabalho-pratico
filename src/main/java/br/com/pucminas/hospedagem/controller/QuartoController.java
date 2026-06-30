@@ -5,6 +5,8 @@ import br.com.pucminas.hospedagem.dto.quarto.QuartoRequest;
 import br.com.pucminas.hospedagem.dto.quarto.QuartoResponse;
 import br.com.pucminas.hospedagem.service.QuartoService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,12 +43,12 @@ public class QuartoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<QuartoResponse>> listar(
-            @RequestParam(required = false) Long residenciaId) {
-        List<QuartoResponse> response = residenciaId != null
-                ? quartoService.listarPorResidencia(residenciaId)
-                : quartoService.listar();
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> listar(
+            @RequestParam(required = false) Long residenciaId, Pageable pageable) {
+        if (residenciaId != null) {
+            return ResponseEntity.ok(quartoService.listarPorResidencia(residenciaId));
+        }
+        return ResponseEntity.ok(quartoService.listar(pageable));
     }
 
     @GetMapping("/{id}")

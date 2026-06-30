@@ -4,6 +4,8 @@ import br.com.pucminas.hospedagem.dto.residencia.ResidenciaRequest;
 import br.com.pucminas.hospedagem.dto.residencia.ResidenciaResponse;
 import br.com.pucminas.hospedagem.service.ResidenciaService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,8 +45,8 @@ public class ResidenciaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ResidenciaResponse>> listar() {
-        return ResponseEntity.ok(residenciaService.listar());
+    public ResponseEntity<Page<ResidenciaResponse>> listar(Pageable pageable) {
+        return ResponseEntity.ok(residenciaService.listar(pageable));
     }
 
     @GetMapping("/{id}")

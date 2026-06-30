@@ -18,6 +18,8 @@ import br.com.pucminas.hospedagem.repository.ClienteRepository;
 import br.com.pucminas.hospedagem.repository.QuartoRepository;
 import br.com.pucminas.hospedagem.repository.ReservaRepository;
 import br.com.pucminas.hospedagem.service.calculo.CalculadoraDiaria;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -113,10 +115,8 @@ public class AluguelService {
 
     /** Lista todos os alugueis. */
     @Transactional(readOnly = true)
-    public List<AluguelResponse> listar() {
-        return aluguelRepository.findAll().stream()
-                .map(AluguelResponse::de)
-                .toList();
+    public Page<AluguelResponse> listar(Pageable pageable) {
+        return aluguelRepository.findAll(pageable).map(AluguelResponse::de);
     }
 
     /** Busca um aluguel pelo seu identificador. */

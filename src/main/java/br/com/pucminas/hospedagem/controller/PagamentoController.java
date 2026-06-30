@@ -4,6 +4,8 @@ import br.com.pucminas.hospedagem.dto.pagamento.PagamentoResponse;
 import br.com.pucminas.hospedagem.dto.pagamento.PagarRequest;
 import br.com.pucminas.hospedagem.service.PagamentoService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,8 +30,8 @@ public class PagamentoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PagamentoResponse>> listar() {
-        return ResponseEntity.ok(pagamentoService.listar());
+    public ResponseEntity<Page<PagamentoResponse>> listar(Pageable pageable) {
+        return ResponseEntity.ok(pagamentoService.listar(pageable));
     }
 
     @GetMapping("/{id}")

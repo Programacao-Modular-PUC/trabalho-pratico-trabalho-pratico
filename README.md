@@ -217,7 +217,7 @@ mvnw.cmd test      # Windows
 ./mvnw test        # Linux / Mac
 ```
 
-Os testes usam **H2 em memória** — não exigem o MySQL. São **38 testes**: unitários dos serviços (com Mockito) e de integração ponta a ponta dos endpoints REST (com MockMvc).
+Os testes usam **H2 em memória** — não exigem o MySQL. São **41 testes**: unitários dos serviços (com Mockito) e de integração ponta a ponta dos endpoints REST (com MockMvc).
 
 ---
 
@@ -235,6 +235,10 @@ Os testes usam **H2 em memória** — não exigem o MySQL. São **38 testes**: u
 | Recibo | GET | `/api/alugueis/{id}/recibo` |
 | Histórico por residência | GET | `/api/alugueis/residencia/{id}` |
 | Pagamentos | GET | `/api/pagamentos` (+ `/{id}/pagar`, `/{id}/cancelar`) |
+| Relatório de faturamento | GET | `/api/relatorios/faturamento/residencia/{id}` |
+| Quartos disponíveis no período | GET | `/api/relatorios/quartos-disponiveis?dataEntrada=...&dataSaida=...` |
+
+> **Paginação:** as listagens gerais (`GET /api/clientes`, `/api/residencias`, `/api/quartos`, `/api/alugueis`, `/api/reservas`, `/api/pagamentos`) aceitam `?page=`, `?size=` e `?sort=` — ex.: `GET /api/clientes?page=0&size=10&sort=nome,asc` — e retornam a estrutura paginada do Spring Data (`content`, `totalElements`, `totalPages`, ...).
 
 ### Exemplo — realizar um aluguel
 

@@ -7,6 +7,8 @@ import br.com.pucminas.hospedagem.exception.ResourceNotFoundException;
 import br.com.pucminas.hospedagem.model.Pagamento;
 import br.com.pucminas.hospedagem.model.enums.StatusPagamento;
 import br.com.pucminas.hospedagem.repository.PagamentoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +28,8 @@ public class PagamentoService {
     }
 
     @Transactional(readOnly = true)
-    public List<PagamentoResponse> listar() {
-        return pagamentoRepository.findAll().stream()
-                .map(PagamentoResponse::de)
-                .toList();
+    public Page<PagamentoResponse> listar(Pageable pageable) {
+        return pagamentoRepository.findAll(pageable).map(PagamentoResponse::de);
     }
 
     @Transactional(readOnly = true)

@@ -8,6 +8,8 @@ import br.com.pucminas.hospedagem.exception.BusinessException;
 import br.com.pucminas.hospedagem.exception.ResourceNotFoundException;
 import br.com.pucminas.hospedagem.model.Cliente;
 import br.com.pucminas.hospedagem.repository.ClienteRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,10 +82,8 @@ public class ClienteService {
      * @return lista de representacoes (sem senha)
      */
     @Transactional(readOnly = true)
-    public List<ClienteResponse> listar() {
-        return clienteRepository.findAll().stream()
-                .map(ClienteResponse::fromEntity)
-                .toList();
+    public Page<ClienteResponse> listar(Pageable pageable) {
+        return clienteRepository.findAll(pageable).map(ClienteResponse::fromEntity);
     }
 
     /**

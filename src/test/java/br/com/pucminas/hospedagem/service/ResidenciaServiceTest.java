@@ -9,6 +9,9 @@ import br.com.pucminas.hospedagem.model.Residencia;
 import br.com.pucminas.hospedagem.model.enums.TipoQuarto;
 import br.com.pucminas.hospedagem.repository.ResidenciaRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -142,12 +145,13 @@ class ResidenciaServiceTest {
         Residencia r2 = new Residencia("End 2", "2", "B2", "22222-000", "tel2", "e2@x.com");
         r2.setId(2L);
 
-        when(residenciaRepository.findAll()).thenReturn(List.of(r1, r2));
+        when(residenciaRepository.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(r1, r2)));
 
-        List<ResidenciaResponse> responses = residenciaService.listar();
+        Page<ResidenciaResponse> responses = residenciaService.listar(Pageable.unpaged());
 
-        assertThat(responses).hasSize(2);
-        assertThat(responses).extracting(ResidenciaResponse::id).containsExactly(1L, 2L);
+        assertThat(responses.getContent()).hasSize(2);
+        assertThat(responses.getContent()).extracting(ResidenciaResponse::id).containsExactly(1L, 2L);
     }
 
     @Test

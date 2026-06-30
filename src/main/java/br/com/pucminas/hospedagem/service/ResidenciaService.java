@@ -5,6 +5,8 @@ import br.com.pucminas.hospedagem.dto.residencia.ResidenciaResponse;
 import br.com.pucminas.hospedagem.exception.ResourceNotFoundException;
 import br.com.pucminas.hospedagem.model.Residencia;
 import br.com.pucminas.hospedagem.repository.ResidenciaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,11 +43,8 @@ public class ResidenciaService {
 
     /** Lista todas as residencias cadastradas. */
     @Transactional(readOnly = true)
-    public List<ResidenciaResponse> listar() {
-        return residenciaRepository.findAll()
-                .stream()
-                .map(ResidenciaResponse::fromEntity)
-                .toList();
+    public Page<ResidenciaResponse> listar(Pageable pageable) {
+        return residenciaRepository.findAll(pageable).map(ResidenciaResponse::fromEntity);
     }
 
     /** Busca uma residencia pelo id, lancando 404 caso nao exista. */
